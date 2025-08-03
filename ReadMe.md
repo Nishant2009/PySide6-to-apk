@@ -130,8 +130,6 @@ sudo apt install p7zip-full
   You must start a build with "Edit Spec File manually" checked for the pause/edit/resume workflow to work.
 - **Build fails or hangs?**  
   Check the build log for errors. Ensure all dependencies are installed and your environment is set up for Android builds.
-- **No hover effect on Cancel button?**  
-  Remove any custom/empty stylesheet from the button to inherit the global style.
 
 ---
 
