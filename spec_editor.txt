@@ -1,0 +1,60 @@
+import time
+
+def wait_for_file(file_path, check_interval=7):
+    file = Path(file_path)
+    while not file.exists():
+        time.sleep(check_interval)
+
+# Read auto_values.txt and get default values
+def edit_specs():
+    values = {}
+    values_file = Path.cwd() / "auto_values.txt"
+    if values_file.exists():
+        with open(values_file, "r") as file:
+            for line in file:
+                key, value = line.strip().split("=", 1)
+                values[key] = value
+    title = values.get("title", "My Application")
+    icon_path = values.get("icon_path", "icon.png")
+    package = values.get("package", "com.example.app")
+    version = values.get("version", "0.1.0")
+    edit_manually = values.get("edit_manually", "0")
+
+    package_name = package.split(".")[-1]
+    package_domain = ".".join(package.split(".")[:-1])
+
+    # Edit pysidedeploy.spec
+    pysidedeploy_spec = Path.cwd() / "pysidedeploy.spec"
+    if pysidedeploy_spec.exists():
+        with open(pysidedeploy_spec, "r") as file:
+            lines = file.readlines()
+        for i, line in enumerate(lines):
+            if line.startswith("title ="):
+                lines[i] = f'title = {title}\n'
+            if line.startswith("icon ="):
+                lines[i] = f'icon = {icon_path}\n'
+        with open(pysidedeploy_spec, "w") as file:
+            file.writelines(lines)
+
+    # Edit buildozer.spec
+    buildozer_spec = Path.cwd() / "buildozer.spec"
+    if buildozer_spec.exists():
+        with open(buildozer_spec, "r") as file:
+            lines = file.readlines()
+        for i, line in enumerate(lines):
+            if line.startswith("title ="):
+                lines[i] = f'title = {title}\n'
+            if line.startswith("icon.filename = "):
+                lines[i] = f'icon.filename = {icon_path}\n'
+            if line.startswith("package.name ="):
+                lines[i] = f'package.name = {package_name}\n'
+            if line.startswith("package.domain ="):
+                lines[i] = f'package.domain = {package_domain}\n'
+            if line.startswith("version ="):
+                lines[i] = f'version = {version}\n'
+        with open(buildozer_spec, "w") as file:
+            file.writelines(lines)
+
+    if edit_manually == "1":
+        wait_for_file("continue.flag")
+
